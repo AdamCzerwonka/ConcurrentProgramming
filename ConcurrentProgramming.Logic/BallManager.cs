@@ -6,25 +6,32 @@ namespace ConcurrentProgramming.Logic;
 
 public class BallManager
 {
-    public BallManager(int amountOfBalls)
+    private readonly int _width;
+    private readonly int _height;
+    private readonly Random _random = new();
+
+    public BallManager(int width, int height)
     {
-        _amountOfBalls = amountOfBalls;
+        _width = width;
+        _height = height;
     }
 
-    private int _amountOfBalls;
-    private readonly Random _random = new Random();
+    public event EventHandler<BallEventArgs>? BallCreated;
 
-    public void Start()
+    public void Start(int amountOfBalls)
     {
-        for (var i = 0; i < _amountOfBalls; i++)
+        const int diameter = 40;
+        for (var i = 0; i < amountOfBalls; i++)
         {
-            var vel = new Vec2(generateRandom(-5, 5), generateRandom(-5, 5));
-            var ball = new Ball(_random.Next(0, 600 - 20), _random.Next(0, 600 - 20), vel);
-            BallCreated.Invoke(this, new BallEventArgs { Ball = ball });
+            var vel = new Vec2(GenerateRandom(-5, 5), GenerateRandom(-5, 5));
+            var ballX = _random.Next(20, _width - diameter - 20);
+            var ballY = _random.Next(20, _height - diameter - 20);
+            var ball = new Ball(ballX, ballY, diameter, vel);
+            BallCreated?.Invoke(this, new BallEventArgs(ball));
         }
     }
 
-    private int generateRandom(int min, int max)
+    private int GenerateRandom(int min, int max)
     {
         int num = 0;
         while (num == 0)
@@ -34,12 +41,4 @@ public class BallManager
 
         return num;
     }
-
-
-    public event EventHandler<BallEventArgs> BallCreated;
-}
-
-public class BallEventArgs : EventArgs
-{
-    public IBall Ball;
 }

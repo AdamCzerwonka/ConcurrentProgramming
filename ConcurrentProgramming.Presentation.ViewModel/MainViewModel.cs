@@ -32,9 +32,9 @@ public class MainViewModel : NotifyPropertyChanged
 
     private void Start()
     {
-        var manager = new BallManager(AmountOfBalls);
+        var manager = new BallManager(600, 600);
         manager.BallCreated += OnBallCreated;
-        manager.Start();
+        manager.Start(AmountOfBalls);
     }
 
     private void OnBallCreated(object? sender, BallEventArgs e)
@@ -45,7 +45,7 @@ public class MainViewModel : NotifyPropertyChanged
         {
             Left = e.Ball.X,
             Top = e.Ball.Y,
-            Radius = 10,
+            Radius = e.Ball.Diameter / 2,
             Color = colors[random.Next(colors.Length)]
         };
         e.Ball.BallChanged += ball.OnBallChanged;
