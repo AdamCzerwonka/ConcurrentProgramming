@@ -31,6 +31,11 @@ public class BallManager : IBallManager
         }
     }
 
+    public void Stop()
+    {
+        _ballRepository.Dispose();
+    } 
+
     private int GenerateRandom(int min, int max)
     {
         int num = 0;

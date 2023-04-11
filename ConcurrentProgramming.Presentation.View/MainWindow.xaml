@@ -6,12 +6,10 @@
         xmlns:local="clr-namespace:ConcurrentProgramming.Presentation.View"
         xmlns:viewModel="clr-namespace:ConcurrentProgramming.Presentation.ViewModel;assembly=ConcurrentProgramming.Presentation.ViewModel"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=viewModel:MainViewModel, IsDesignTimeCreatable=True}"
         Title="Ball Simulation" Height="800" Width="800" ResizeMode="NoResize">
-    <!-- <Window.DataContext> -->
-    <!--     <viewModel:MainViewModel /> -->
-    <!-- </Window.DataContext> -->
     <Window.Resources>
-        <local:ColorToSolidBrushConverter x:Key="ColorToSolidBrushConverter"/>
+        <local:ColorToSolidBrushConverter x:Key="ColorToSolidBrushConverter" />
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -24,13 +22,20 @@
             <TextBox
                 Text="{Binding AmountOfBalls}"
                 VerticalAlignment="Center" Width="150" FontSize="12" />
-            <Button Command="{Binding StartCommand}"
-                    Margin="0 0 15 0"
-                    HorizontalAlignment="Right"
-                    Width="100"
-                    VerticalAlignment="Center">
-                Start
-            </Button>
+            <DockPanel HorizontalAlignment="Right">
+                <Button Command="{Binding RestartCommand}"
+                        Margin="0 0 15 0"
+                        Width="100"
+                        VerticalAlignment="Center">
+                    Stop
+                </Button>
+                <Button Command="{Binding StartCommand}"
+                        Margin="0 0 15 0"
+                        Width="100"
+                        VerticalAlignment="Center">
+                    Start
+                </Button>
+            </DockPanel>
         </DockPanel>
         <Border Margin="0 20 0 0" Grid.Row="1" BorderThickness="4" BorderBrush="Black" Width="608" Background="Red">
             <ItemsControl ItemsSource="{Binding Balls}">
