@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ConcurrentProgramming.Logic;
+namespace ConcurrentProgramming.Data;
 
 public class BallEventArgs : EventArgs
 {

@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
+using ConcurrentProgramming.Data;
 using ConcurrentProgramming.Logic;
 using Ball = ConcurrentProgramming.Presentation.Model.Ball;
 
@@ -32,9 +33,10 @@ public class MainViewModel : NotifyPropertyChanged
 
     private void Start()
     {
-        var manager = new BallManager(600, 600);
+        var repo = new BallRepository();
+        var manager = new BallManager(repo);
         manager.BallCreated += OnBallCreated;
-        manager.Start(AmountOfBalls);
+        manager.Start(600, 600, AmountOfBalls);
     }
 
     private void OnBallCreated(object? sender, BallEventArgs e)

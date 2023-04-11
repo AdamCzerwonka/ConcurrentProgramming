@@ -1,32 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using ConcurrentProgramming.Data;
 
 namespace ConcurrentProgramming.Logic;
 
-public class BallManager
+public class BallManager : IBallManager
 {
-    private readonly int _width;
-    private readonly int _height;
+    private readonly IBallRepository _ballRepository;
     private readonly Random _random = new();
 
-    public BallManager(int width, int height)
+    public BallManager(IBallRepository ballRepository)
     {
-        _width = width;
-        _height = height;
+        _ballRepository = ballRepository;
     }
 
     public event EventHandler<BallEventArgs>? BallCreated;
 
-    public void Start(int amountOfBalls)
+    public void Start(int width, int height, int amountOfBalls)
     {
         const int diameter = 40;
         for (var i = 0; i < amountOfBalls; i++)
         {
             var vel = new Vec2(GenerateRandom(-5, 5), GenerateRandom(-5, 5));
-            var ballX = _random.Next(20, _width - diameter - 20);
-            var ballY = _random.Next(20, _height - diameter - 20);
+            var ballX = _random.Next(20, width - diameter - 20);
+            var ballY = _random.Next(20, height - diameter - 20);
             var ball = new Ball(ballX, ballY, diameter, vel);
+            _ballRepository.Add(ball);
             BallCreated?.Invoke(this, new BallEventArgs(ball));
         }
     }
@@ -40,5 +40,10 @@ public class BallManager
         }
 
         return num;
+    }
+
+    public void Dispose()
+    {
+        _ballRepository.Dispose();
     }
 }
