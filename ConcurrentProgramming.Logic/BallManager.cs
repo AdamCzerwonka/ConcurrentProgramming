@@ -22,7 +22,15 @@ public class BallManager : IBallManager
         const int diameter = 40;
         for (var i = 0; i < amountOfBalls; i++)
         {
-            var vel = new Vec2(GenerateRandom(-5, 5), GenerateRandom(-5, 5));
+            var velX = _random.Next(-5, 5);
+            var velY = _random.Next(-5, 5);
+            while (velX == 0 & velY == 0)
+            {
+                velX = _random.Next(-5, 5);
+                velY = _random.Next(-5, 5);
+            }
+
+            var vel = new Vec2(velX, velY);
             var ballX = _random.Next(20, width - diameter - 20);
             var ballY = _random.Next(20, height - diameter - 20);
             var ball = new Ball(ballX, ballY, diameter, vel);
@@ -34,17 +42,6 @@ public class BallManager : IBallManager
     public void Stop()
     {
         _ballRepository.Dispose();
-    } 
-
-    private int GenerateRandom(int min, int max)
-    {
-        int num = 0;
-        while (num == 0)
-        {
-            num = _random.Next(min, max);
-        }
-
-        return num;
     }
 
     public void Dispose()

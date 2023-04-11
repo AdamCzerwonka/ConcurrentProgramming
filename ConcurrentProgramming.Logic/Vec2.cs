@@ -1,4 +1,6 @@
-﻿namespace ConcurrentProgramming.Logic;
+﻿using System;
+
+namespace ConcurrentProgramming.Logic;
 
 public struct Vec2
 {
