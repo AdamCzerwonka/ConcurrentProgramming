@@ -8,13 +8,13 @@ namespace ConcurrentProgramming.Presentation.View
 {
     public partial class App : Application
     {
-        private readonly ServiceProvider _servisProvider;
+        private readonly ServiceProvider _serviceProvider;
 
         public App()
         {
             var services = new ServiceCollection();
             ConfigureServices(services);
-            _servisProvider = services.BuildServiceProvider();
+            _serviceProvider = services.BuildServiceProvider();
         }
         
         private void ConfigureServices(IServiceCollection services)
@@ -30,7 +30,7 @@ namespace ConcurrentProgramming.Presentation.View
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            MainWindow = _servisProvider.GetRequiredService<MainWindow>();
+            MainWindow = _serviceProvider.GetRequiredService<MainWindow>();
             MainWindow.Show();
             base.OnStartup(e);
         }
