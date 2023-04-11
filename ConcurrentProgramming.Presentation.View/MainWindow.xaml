@@ -6,10 +6,10 @@
         xmlns:local="clr-namespace:ConcurrentProgramming.Presentation.View"
         xmlns:viewModel="clr-namespace:ConcurrentProgramming.Presentation.ViewModel;assembly=ConcurrentProgramming.Presentation.ViewModel"
         mc:Ignorable="d"
-        Title="Ball Simulation" Height="800" Width="800">
-    <Window.DataContext>
-        <viewModel:MainViewModel />
-    </Window.DataContext>
+        Title="Ball Simulation" Height="800" Width="800" ResizeMode="NoResize">
+    <!-- <Window.DataContext> -->
+    <!--     <viewModel:MainViewModel /> -->
+    <!-- </Window.DataContext> -->
     <Window.Resources>
         <local:ColorToSolidBrushConverter x:Key="ColorToSolidBrushConverter"/>
     </Window.Resources>

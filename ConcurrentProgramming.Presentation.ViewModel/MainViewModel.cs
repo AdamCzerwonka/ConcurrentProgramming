@@ -10,10 +10,12 @@ namespace ConcurrentProgramming.Presentation.ViewModel;
 
 public class MainViewModel : NotifyPropertyChanged
 {
+    private readonly IBallManager _ballManager;
     private int _amountOfBalls = 10;
 
-    public MainViewModel()
+    public MainViewModel(IBallManager ballManager)
     {
+        _ballManager = ballManager;
         StartCommand = new RelayCommand(Start);
     }
 
@@ -33,10 +35,8 @@ public class MainViewModel : NotifyPropertyChanged
 
     private void Start()
     {
-        var repo = new BallRepository();
-        var manager = new BallManager(repo);
-        manager.BallCreated += OnBallCreated;
-        manager.Start(600, 600, AmountOfBalls);
+        _ballManager.BallCreated += OnBallCreated;
+        _ballManager.Start(600, 600, AmountOfBalls);
     }
 
     private void OnBallCreated(object? sender, BallEventArgs e)
