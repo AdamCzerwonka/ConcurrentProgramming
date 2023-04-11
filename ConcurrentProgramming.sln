@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConcurrentProgramming.Prese
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConcurrentProgramming.Logic.Tests", "ConcurrentProgramming.Logic.Tests\ConcurrentProgramming.Logic.Tests.csproj", "{F9156854-0111-44FA-947C-5FEE65B81D1F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConcurrentProgramming.Data.Tests", "ConcurrentProgramming.Data.Tests\ConcurrentProgramming.Data.Tests.csproj", "{D84C174E-F351-4ACB-80A0-2F6ADA68A1F7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{F9156854-0111-44FA-947C-5FEE65B81D1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9156854-0111-44FA-947C-5FEE65B81D1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9156854-0111-44FA-947C-5FEE65B81D1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D84C174E-F351-4ACB-80A0-2F6ADA68A1F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D84C174E-F351-4ACB-80A0-2F6ADA68A1F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D84C174E-F351-4ACB-80A0-2F6ADA68A1F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D84C174E-F351-4ACB-80A0-2F6ADA68A1F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
