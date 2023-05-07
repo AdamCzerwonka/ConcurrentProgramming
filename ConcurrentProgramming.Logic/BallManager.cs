@@ -61,6 +61,7 @@ public class BallManager : IBallManager
         {
             return;
         }
+
         if (sender is null)
         {
             return;
@@ -92,12 +93,12 @@ public class BallManager : IBallManager
                 var newBallVel = CalculateNewVelocity(ball, origin);
                 origin.Velocity = newOriginVel;
                 ball.Velocity = newBallVel;
-            }
 
-            _collisions.Remove(origin, out _);
-            _collisions.Remove(ball, out _);
-            _collisions.TryAdd(origin, ball);
-            _collisions.TryAdd(ball, origin);
+                _collisions.Remove(origin, out _);
+                _collisions.Remove(ball, out _);
+                _collisions.TryAdd(origin, ball);
+                _collisions.TryAdd(ball, origin);
+            }
         }
 
         _semaphore.Release();
