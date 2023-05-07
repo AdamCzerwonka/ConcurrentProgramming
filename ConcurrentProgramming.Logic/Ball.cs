@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using System.Threading;
 using ConcurrentProgramming.Data;
 
@@ -7,48 +8,60 @@ namespace ConcurrentProgramming.Logic;
 public class Ball : IBall
 {
     private readonly Timer _timer;
-    private Vec2 _velocity;
+    private Vector2 _velocity;
     private readonly int _width;
     private readonly int _height;
 
-    public Ball(int x, int y, int diameter, Vec2 velocity, int width, int height)
+    public Ball(int x, int y, int diameter, Vector2 velocity, int width, int height)
     {
-        _position = new Vec2(x, y);
+        _position = new Vector2(x, y);
         _velocity = velocity;
         _width = width;
         _height = height;
         Diameter = diameter;
         _timer = new Timer(Move, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(16));
+        Mass = 1;
+        Radius = Diameter / 2;
     }
 
-    public Vec2 Velocity
+    public Vector2 Velocity
     {
         get => _velocity;
         set => _velocity = value;
     }
 
-    private Vec2 _position;
+    private Vector2 _position;
 
-    public int X => _position.X;
-
-    public int Y => _position.Y;
+    public int X => (int)_position.X;
+    public int Y => (int)_position.Y;
     public int Diameter { get; }
+    public int Mass { get; }
+
+    public int Radius { get; }
     public event EventHandler<BallEventArgs>? BallChanged;
 
     private void Move(object? _)
-    {        
+    {
         _position += _velocity;
-        
-        if (_position.X - Diameter / 2 <= 0 || _position.X + Diameter / 2>= _width)
+
+        if (_position.X - Radius <= 0)
         {
-            _velocity.X = -_velocity.X;
+            _velocity.X = Math.Abs(_velocity.X);
         }
-        
-        if (_position.Y - Diameter / 2 <= 0 || _position.Y + Diameter / 2>= _height)
+        else if (_position.X + Radius >= _width)
         {
-            _velocity.Y = -_velocity.Y;
+            _velocity.X = -Math.Abs(_velocity.X);
         }
-        
+
+        if (_position.Y - Radius <= 0)
+        {
+            _velocity.Y = Math.Abs(_velocity.Y);
+        }
+        else if (_position.Y + Radius >= _height)
+        {
+            _velocity.Y = -Math.Abs(_velocity.Y);
+        }
+
         BallChanged?.Invoke(this, new BallEventArgs(this));
     }
 
