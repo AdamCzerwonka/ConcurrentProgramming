@@ -9,18 +9,14 @@ public class Ball : IBall
 {
     private readonly Timer _timer;
     private Vector2 _velocity;
-    private readonly int _width;
-    private readonly int _height;
 
-    public Ball(int x, int y, int diameter, Vector2 velocity, int width, int height)
+    public Ball(int x, int y, int diameter, Vector2 velocity, int mass)
     {
         _position = new Vector2(x, y);
         _velocity = velocity;
-        _width = width;
-        _height = height;
-        Diameter = diameter;
-        _timer = new Timer(Move, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(16));
-        Mass = 1;
+        Diameter = (int)(0.3 * mass);
+        _timer = new Timer(Move, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(32));
+        Mass = mass;
         Radius = Diameter / 2;
     }
 
@@ -29,6 +25,8 @@ public class Ball : IBall
         get => _velocity;
         set => _velocity = value;
     }
+
+    public Vector2 Position => _position;
 
     private Vector2 _position;
 
@@ -44,23 +42,6 @@ public class Ball : IBall
     {
         _position += _velocity;
 
-        if (_position.X - Radius <= 0)
-        {
-            _velocity.X = Math.Abs(_velocity.X);
-        }
-        else if (_position.X + Radius >= _width)
-        {
-            _velocity.X = -Math.Abs(_velocity.X);
-        }
-
-        if (_position.Y - Radius <= 0)
-        {
-            _velocity.Y = Math.Abs(_velocity.Y);
-        }
-        else if (_position.Y + Radius >= _height)
-        {
-            _velocity.Y = -Math.Abs(_velocity.Y);
-        }
 
         BallChanged?.Invoke(this, new BallEventArgs(this));
     }

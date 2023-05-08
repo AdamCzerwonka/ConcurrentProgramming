@@ -11,4 +11,6 @@ public interface IBall : IDisposable
     int Mass { get; }
     event EventHandler<BallEventArgs> BallChanged;
     Vector2 Velocity { get; set; }
+    public Vector2 Position { get;}
+    public int Radius { get; }
 }
