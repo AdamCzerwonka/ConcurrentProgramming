@@ -123,9 +123,6 @@ public class BallManager : IBallManager
                 continue;
             }
             
-            // origin.PositionLock.AcquireReaderLock(10);
-            // ball.PositionLock.AcquireReaderLock(10);
-
             var dist = Vector2.Distance(origin.Position, ball.Position);
 
             if (dist <= (origin.Diameter + ball.Diameter) / 2.0)
@@ -140,8 +137,6 @@ public class BallManager : IBallManager
                 _collisions.TryAdd(origin, ball);
                 _collisions.TryAdd(ball, origin);
             }
-            // origin.PositionLock.ReleaseReaderLock();
-            // ball.PositionLock.ReleaseReaderLock();
         }
 
         _semaphore.Release();
