@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using System.Threading;
 
 namespace ConcurrentProgramming.Data;
 
@@ -13,4 +14,5 @@ public interface IBall : IDisposable
     Vector2 Velocity { get; set; }
     public Vector2 Position { get;}
     public int Radius { get; }
+    public ReaderWriterLock PositionLock { get; }
 }

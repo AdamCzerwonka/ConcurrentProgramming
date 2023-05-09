@@ -73,19 +73,23 @@ public class BallManager : IBallManager
         if (ball.Position.X - ball.Radius <= -1)
         {
             newVel.X = Math.Abs(ball.Velocity.X);
+            _collisions.Remove(ball, out _);
         }
         else if (ball.Position.X + ball.Radius >= _width)
         {
             newVel.X = -Math.Abs(ball.Velocity.X);
+            _collisions.Remove(ball, out _);
         }
 
         if (ball.Position.Y - ball.Radius <= -1)
         {
             newVel.Y = Math.Abs(ball.Velocity.Y);
+            _collisions.Remove(ball, out _);
         }
         else if (ball.Position.Y + ball.Radius >= _height)
         {
             newVel.Y = -Math.Abs(ball.Velocity.Y);
+            _collisions.Remove(ball, out _);
         }
 
         ball.Velocity = newVel;
@@ -118,6 +122,9 @@ public class BallManager : IBallManager
             {
                 continue;
             }
+            
+            // origin.PositionLock.AcquireReaderLock(10);
+            // ball.PositionLock.AcquireReaderLock(10);
 
             var dist = Vector2.Distance(origin.Position, ball.Position);
 
@@ -133,6 +140,8 @@ public class BallManager : IBallManager
                 _collisions.TryAdd(origin, ball);
                 _collisions.TryAdd(ball, origin);
             }
+            // origin.PositionLock.ReleaseReaderLock();
+            // ball.PositionLock.ReleaseReaderLock();
         }
 
         _semaphore.Release();

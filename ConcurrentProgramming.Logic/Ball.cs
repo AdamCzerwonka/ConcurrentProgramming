@@ -14,7 +14,7 @@ public class Ball : IBall
     {
         _position = new Vector2(x, y);
         _velocity = velocity;
-        Diameter = (int)(0.3 * mass);
+        Diameter = 10;
         _timer = new Timer(Move, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(32));
         Mass = mass;
         Radius = Diameter / 2;
@@ -28,6 +28,7 @@ public class Ball : IBall
 
     public Vector2 Position => _position;
 
+    public ReaderWriterLock PositionLock { get; } = new();
     private Vector2 _position;
 
     public int X => (int)_position.X;
@@ -40,7 +41,9 @@ public class Ball : IBall
 
     private void Move(object? _)
     {
+        // PositionLock.AcquireWriterLock(10);
         _position += _velocity;
+        // PositionLock.ReleaseWriterLock();
 
 
         BallChanged?.Invoke(this, new BallEventArgs(this));
