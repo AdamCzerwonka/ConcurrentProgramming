@@ -40,8 +40,8 @@ public sealed class Ball : INotifyPropertyChanged
 
     public void OnBallChanged(object? sender, BallEventArgs e)
     {
-        Top = e.Ball.Y;
-        Left = e.Ball.X;
+        Top = e.Ball.Y - Radius;
+        Left = e.Ball.X - Radius;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel.Design.Serialization;
 using System.Drawing;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
