@@ -11,8 +11,8 @@ public class BallManager : IBallManager
 {
     private readonly IBallRepository _ballRepository;
     private readonly Random _random = new();
-    private readonly SemaphoreSlim _semaphore;
     private readonly ConcurrentDictionary<IBall, IBall> _collisions;
+    private readonly object _collisionLock = new();
     private bool _disableCollisions = true;
     private int _height;
     private int _width;
@@ -20,7 +20,6 @@ public class BallManager : IBallManager
     public BallManager(IBallRepository ballRepository)
     {
         _ballRepository = ballRepository;
-        _semaphore = new SemaphoreSlim(1);
         _collisions = new ConcurrentDictionary<IBall, IBall>();
     }
 
@@ -108,38 +107,38 @@ public class BallManager : IBallManager
         }
 
         var origin = (IBall)sender;
-        _semaphore.Wait();
-        foreach (var ball in _ballRepository.Get())
+        lock (_collisionLock)
         {
-            if (_collisions.TryGetValue(origin, out var ball1Last) &&
-                _collisions.TryGetValue(ball, out var ball2Last) &&
-                ball1Last == ball && ball2Last == origin)
+            foreach (var ball in _ballRepository.Get())
             {
-                continue;
-            }
+                if (_collisions.TryGetValue(origin, out var ball1Last) &&
+                    _collisions.TryGetValue(ball, out var ball2Last) &&
+                    ball1Last == ball && ball2Last == origin)
+                {
+                    continue;
+                }
 
-            if (ball == origin)
-            {
-                continue;
-            }
-            
-            var dist = Vector2.Distance(origin.Position, ball.Position);
+                if (ball == origin)
+                {
+                    continue;
+                }
 
-            if (dist <= (origin.Diameter + ball.Diameter) / 2.0)
-            {
-                var newOriginVel = CalculateNewVelocity(origin, ball);
-                var newBallVel = CalculateNewVelocity(ball, origin);
-                origin.Velocity = newOriginVel;
-                ball.Velocity = newBallVel;
+                var dist = Vector2.Distance(origin.Position, ball.Position);
 
-                _collisions.Remove(origin, out _);
-                _collisions.Remove(ball, out _);
-                _collisions.TryAdd(origin, ball);
-                _collisions.TryAdd(ball, origin);
+                if (dist <= (origin.Diameter + ball.Diameter) / 2.0)
+                {
+                    var newOriginVel = CalculateNewVelocity(origin, ball);
+                    var newBallVel = CalculateNewVelocity(ball, origin);
+                    origin.Velocity = newOriginVel;
+                    ball.Velocity = newBallVel;
+
+                    _collisions.Remove(origin, out _);
+                    _collisions.Remove(ball, out _);
+                    _collisions.TryAdd(origin, ball);
+                    _collisions.TryAdd(ball, origin);
+                }
             }
         }
-
-        _semaphore.Release();
     }
 
     private Vector2 CalculateNewVelocity(IBall ball1, IBall ball2)
