@@ -4,4 +4,5 @@ public interface ILoggerWriter
 {
     string path { get; set; }
     void Write(string log);
+    void Dispose();
 }

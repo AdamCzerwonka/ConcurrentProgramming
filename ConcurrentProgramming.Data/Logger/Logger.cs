@@ -12,12 +12,12 @@ public class Logger : ILogger
     private readonly ConcurrentQueue<string> _logs;
     private Task _writer;
     private ILoggerWriter _loggerWriter;
-    
+    private bool isLogging;
+
     public Logger(ILoggerWriter loggerWriter)
     {
         _loggerWriter = loggerWriter;
         _logs = new ConcurrentQueue<string>();
-        _writer = Task.Run(WriteLogs);
     }
 
     public void AddLog(string newLog)
@@ -25,9 +25,31 @@ public class Logger : ILogger
         _logs.Enqueue(newLog);
     }
 
+    public void Start()
+    {
+        isLogging = true;
+        _writer = Task.Run(WriteLogs);
+    }
+
+    public void StopLogging()
+    {
+        isLogging = false;
+    }
+
+    public int GetNumberOfUnwrittenLogs()
+    {
+        return _logs.Count;
+    }
+
+    public void Dispose()
+    {
+        _writer.Dispose();
+        _loggerWriter.Dispose();
+    }
+
     public void WriteLogs()
     {
-        while (true)
+        while (isLogging && _logs.Count > 0)
         {
             string? log;
             var anyLogs = _logs.TryDequeue(out log);

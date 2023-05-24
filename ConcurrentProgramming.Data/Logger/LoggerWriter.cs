@@ -26,4 +26,9 @@ public class LoggerWriter : ILoggerWriter
         _fileWriter.WriteLine(log);
         _fileWriter.Flush();
     }
+
+    public void Dispose()
+    {
+        _fileWriter.Dispose();
+    }
 }

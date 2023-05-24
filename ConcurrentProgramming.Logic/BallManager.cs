@@ -54,11 +54,31 @@ public class BallManager : IBallManager
             BallCreated?.Invoke(this, new BallEventArgs(ball));
         }
 
+        _logger.Start();
         _disableCollisions = false;
     }
 
     public void Stop()
     {
+        _logger.StopLogging();
+        while (true)
+        {
+            bool test = true;
+            lock (_logger)
+            {
+                if (_logger.GetNumberOfUnwrittenLogs() == 0)
+                {
+                    test = false;
+                }
+            }
+
+            if (!test)
+            {
+                break;
+            }
+            Thread.Sleep(1000);
+        }
+
         _ballRepository.Dispose();
     }
 
