@@ -26,6 +26,8 @@ public class BallManager : IBallManager
         _logger = Logger.GetLogger();
         _logger.RegisterWriter(new TextLogWriter("test.txt"));
         _logger.RegisterWriter(new JsonLogWriter("test.json"));
+        _logger.RegisterWriter(new YamlLogWriter("test.yaml"));
+        _logger.RegisterWriter(new XmlLogWriter("test.xml"));
         _logger.Start();
     }
 
