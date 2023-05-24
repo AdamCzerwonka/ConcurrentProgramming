@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Threading;
 using ConcurrentProgramming.Data;
+using ConcurrentProgramming.Data.Logger;
 
 namespace ConcurrentProgramming.Logic;
 
@@ -13,7 +14,6 @@ public class BallManager : IBallManager
     private readonly Random _random = new();
     private readonly ConcurrentDictionary<IBall, IBall> _collisions;
     private readonly object _collisionLock = new();
-    private readonly object _logLock = new();
     private ILogger _logger;
     private bool _disableCollisions = true;
     private int _height;
@@ -23,13 +23,18 @@ public class BallManager : IBallManager
     {
         _ballRepository = ballRepository;
         _collisions = new ConcurrentDictionary<IBall, IBall>();
-        _logger = new Logger(new LoggerWriter(@"C:\Users\kriol\Desktop\test.txt"));
+        _logger = Logger.GetLogger();
+        _logger.RegisterWriter(new TextLogWriter("test.txt"));
+        _logger.RegisterWriter(new JsonLogWriter("test.json"));
+        _logger.Start();
     }
 
     public event EventHandler<BallEventArgs>? BallCreated;
 
     public void Start(int width, int height, int amountOfBalls)
     {
+        _logger.Log(LogLevel.Information,"Starting simulation");
+        
         _width = width;
         _height = height;
         const int diameter = 40;
@@ -54,31 +59,12 @@ public class BallManager : IBallManager
             BallCreated?.Invoke(this, new BallEventArgs(ball));
         }
 
-        _logger.Start();
         _disableCollisions = false;
     }
 
     public void Stop()
     {
-        _logger.StopLogging();
-        while (true)
-        {
-            bool test = true;
-            lock (_logger)
-            {
-                if (_logger.GetNumberOfUnwrittenLogs() == 0)
-                {
-                    test = false;
-                }
-            }
-
-            if (!test)
-            {
-                break;
-            }
-            Thread.Sleep(1000);
-        }
-
+        _logger.Log(LogLevel.Information,"Simulation Ended");
         _ballRepository.Dispose();
     }
 
@@ -88,7 +74,7 @@ public class BallManager : IBallManager
         {
             return;
         }
-        
+
         var ball = (IBall)sender;
         var newVel = new Vector2(ball.Velocity.X, ball.Velocity.Y);
 
@@ -116,10 +102,7 @@ public class BallManager : IBallManager
 
         if (ball.Velocity.X != newVel.X || ball.Velocity.Y != newVel.Y)
         {
-            lock (_logLock)
-            {
-                _logger.AddLog($"wall collision at X:{ball.Position.X}, Y:{ball.Position.Y}");
-            }
+            _logger.Log(LogLevel.Information,$"wall collision at X:{ball.Position.X}, Y:{ball.Position.Y}");
         }
 
         ball.Velocity = newVel;
@@ -185,6 +168,7 @@ public class BallManager : IBallManager
 
     public void Dispose()
     {
+        _logger.Dispose();
         _ballRepository.Dispose();
     }
 }

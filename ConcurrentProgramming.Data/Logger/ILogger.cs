@@ -1,11 +1,12 @@
-﻿namespace ConcurrentProgramming.Data;
+﻿using System;
 
-public interface ILogger
+namespace ConcurrentProgramming.Data.Logger;
+
+public interface ILogger : IDisposable
 {
-    void AddLog(string newLog);
+    void Log(LogLevel level, string message);
     void Start();
     public void StopLogging();
     public int GetNumberOfUnwrittenLogs();
-    void Dispose();
-    void WriteLogs();
+    void RegisterWriter(ILogWriter writer);
 }

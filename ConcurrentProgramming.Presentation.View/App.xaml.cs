@@ -15,6 +15,11 @@ namespace ConcurrentProgramming.Presentation.View
             var services = new ServiceCollection();
             ConfigureServices(services);
             _serviceProvider = services.BuildServiceProvider();
+
+            Dispatcher.ShutdownStarted += (sender, args) =>
+            {
+                _serviceProvider.GetRequiredService<MainViewModel>().Dispose();
+            };
         }
         
         private void ConfigureServices(IServiceCollection services)
@@ -25,7 +30,7 @@ namespace ConcurrentProgramming.Presentation.View
                 DataContext = s.GetRequiredService<MainViewModel>()
             });
             services.AddSingleton<IBallRepository, BallRepository>();
-            services.AddSingleton<IBallManager, BallManager>();
+            services.AddTransient<IBallManager, BallManager>();
         }
 
         protected override void OnStartup(StartupEventArgs e)

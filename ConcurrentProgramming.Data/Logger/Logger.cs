@@ -1,39 +1,62 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace ConcurrentProgramming.Data;
+namespace ConcurrentProgramming.Data.Logger;
 
 public class Logger : ILogger
 {
-    private readonly ConcurrentQueue<string> _logs;
+    private readonly ConcurrentQueue<LogEntry> _logs = new();
     private Task _writer;
-    private ILoggerWriter _loggerWriter;
+    private readonly List<ILogWriter> _loggerWriters = new();
     private bool isLogging;
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
+    private static ILogger? _instance;
+    private static object _loggerLock = new();
 
-    public Logger(ILoggerWriter loggerWriter)
+    public static ILogger GetLogger()
     {
-        _loggerWriter = loggerWriter;
-        _logs = new ConcurrentQueue<string>();
+        if (_instance is null)
+        {
+            lock (_loggerLock)
+            {
+                _instance = new Logger();
+            }
+        }
+
+        return _instance;
     }
 
-    public void AddLog(string newLog)
+    public void RegisterWriter(ILogWriter writer)
     {
-        _logs.Enqueue(newLog);
+        _loggerWriters.Add(writer);
+    }
+
+    public void Log(LogLevel level, string message)
+    {
+        var entry = new LogEntry()
+        {
+            LogLevel = level,
+            Message = message,
+            Time = DateTime.Now
+        };
+
+        _logs.Enqueue(entry);
     }
 
     public void Start()
     {
         isLogging = true;
-        _writer = Task.Run(WriteLogs);
+        var token = _cancellationTokenSource.Token;
+        _writer = Task.Run(() => WriteLogs(token), token);
     }
 
     public void StopLogging()
     {
-        isLogging = false;
+        _cancellationTokenSource.Cancel();
     }
 
     public int GetNumberOfUnwrittenLogs()
@@ -43,20 +66,23 @@ public class Logger : ILogger
 
     public void Dispose()
     {
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource.Dispose();
+        _writer.Wait();
         _writer.Dispose();
-        _loggerWriter.Dispose();
+        foreach (var logWriter in _loggerWriters)
+        {
+            logWriter.Dispose();
+        }
     }
 
-    public void WriteLogs()
+    private async Task WriteLogs(CancellationToken cancellationToken)
     {
-        while (isLogging && _logs.Count > 0)
+        while (!cancellationToken.IsCancellationRequested || !_logs.IsEmpty)
         {
-            string? log;
-            var anyLogs = _logs.TryDequeue(out log);
-
-            if (anyLogs)
+            if (_logs.TryDequeue(out var log))
             {
-                _loggerWriter.Write(log);
+                await Task.WhenAll(_loggerWriters.Select(w => w.Write(log)));
             }
         }
     }
