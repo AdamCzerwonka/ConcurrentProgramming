@@ -13,6 +13,8 @@ public class BallManager : IBallManager
     private readonly Random _random = new();
     private readonly ConcurrentDictionary<IBall, IBall> _collisions;
     private readonly object _collisionLock = new();
+    private readonly object _logLock = new();
+    private ILogger _logger;
     private bool _disableCollisions = true;
     private int _height;
     private int _width;
@@ -21,6 +23,7 @@ public class BallManager : IBallManager
     {
         _ballRepository = ballRepository;
         _collisions = new ConcurrentDictionary<IBall, IBall>();
+        _logger = new Logger(new LoggerWriter(@"C:\Users\kriol\Desktop\test.txt"));
     }
 
     public event EventHandler<BallEventArgs>? BallCreated;
@@ -65,7 +68,7 @@ public class BallManager : IBallManager
         {
             return;
         }
-
+        
         var ball = (IBall)sender;
         var newVel = new Vector2(ball.Velocity.X, ball.Velocity.Y);
 
@@ -89,6 +92,14 @@ public class BallManager : IBallManager
         {
             newVel.Y = -Math.Abs(ball.Velocity.Y);
             _collisions.Remove(ball, out _);
+        }
+
+        if (ball.Velocity.X != newVel.X || ball.Velocity.Y != newVel.Y)
+        {
+            lock (_logLock)
+            {
+                _logger.AddLog($"wall collision at X:{ball.Position.X}, Y:{ball.Position.Y}");
+            }
         }
 
         ball.Velocity = newVel;
