@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
 using System.Threading;
 using ConcurrentProgramming.Data;
@@ -25,18 +26,20 @@ public class BallManager : IBallManager
         _ballRepository = ballRepository;
         _collisions = new ConcurrentDictionary<IBall, IBall>();
         _logger = Logger.GetLogger();
-        _logger.RegisterWriter(new TextLogWriter("test.txt"));
-        _logger.RegisterWriter(new JsonLogWriter("test.json"));
-        _logger.RegisterWriter(new YamlLogWriter("test.yaml"));
-        _logger.RegisterWriter(new XmlLogWriter("test.xml"));
+
+        var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        _logger.RegisterWriter(new TextLogWriter(Path.Combine(path, "textLog.txt")));
+        _logger.RegisterWriter(new JsonLogWriter(Path.Combine(path, "jsonLog.json")));
+        _logger.RegisterWriter(new YamlLogWriter(Path.Combine(path, "yamlLog.yaml")));
+        _logger.RegisterWriter(new XmlLogWriter(Path.Combine(path, "xmlLog.xml")));
     }
 
     public event EventHandler<BallEventArgs>? BallCreated;
 
     public void Start(int width, int height, int amountOfBalls)
     {
-        _logger.Log(LogLevel.Information,"Starting simulation");
-        
+        _logger.Log(LogLevel.Information, "Starting simulation");
+
         _width = width;
         _height = height;
         const int diameter = 40;
@@ -66,7 +69,7 @@ public class BallManager : IBallManager
 
     public void Stop()
     {
-        _logger.Log(LogLevel.Information,"Simulation Ended");
+        _logger.Log(LogLevel.Information, "Simulation Ended");
         _ballRepository.Dispose();
     }
 
@@ -104,7 +107,8 @@ public class BallManager : IBallManager
 
         if (ball.Velocity.X != newVel.X || ball.Velocity.Y != newVel.Y)
         {
-            _logger.Log(LogLevel.Information,$"wall collision at X:{ball.Position.X}, Y:{ball.Position.Y}");
+            _logger.Log(LogLevel.Information,
+                $"wall collision at X:{ball.Position.X}, Y:{ball.Position.Y}, R:{ball.Radius}");
         }
 
         ball.Velocity = newVel;
@@ -143,6 +147,8 @@ public class BallManager : IBallManager
 
                 if (dist <= (origin.Diameter + ball.Diameter) / 2.0)
                 {
+                    _logger.Log(LogLevel.Information,
+                        $"ball collision between balls X:{origin.X}, Y:{origin.Y}, R:{origin.Radius} and X:{ball.X}, Y:{ball.Y}, R:{ball.Radius}");
                     var newOriginVel = CalculateNewVelocity(origin, ball);
                     var newBallVel = CalculateNewVelocity(ball, origin);
                     origin.Velocity = newOriginVel;
@@ -170,6 +176,7 @@ public class BallManager : IBallManager
 
     public void Dispose()
     {
+        _logger.Log(LogLevel.Information, "Closing program");
         _logger.Dispose();
         _ballRepository.Dispose();
     }
