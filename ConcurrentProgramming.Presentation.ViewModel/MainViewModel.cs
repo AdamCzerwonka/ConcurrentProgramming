@@ -8,7 +8,7 @@ using Ball = ConcurrentProgramming.Presentation.Model.Ball;
 
 namespace ConcurrentProgramming.Presentation.ViewModel;
 
-public class MainViewModel : NotifyPropertyChanged,IDisposable
+public class MainViewModel : NotifyPropertyChanged
 {
     private readonly IBallManager _ballManager;
     private int _amountOfBalls = 10;
@@ -75,10 +75,5 @@ public class MainViewModel : NotifyPropertyChanged,IDisposable
         };
         e.Ball.BallChanged += ball.OnBallChanged;
         Balls.Add(ball);
-    }
-
-    public void Dispose()
-    {
-        _ballManager.Dispose();
     }
 }

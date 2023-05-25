@@ -93,19 +93,21 @@ public class Logger : ILogger
                 await Task.WhenAll(_loggerWriters.Select(w => w.Write(log)));
             }
 
-            await Task.Delay(50, cancellationToken);
+            await Task.Delay(32, CancellationToken.None);
         }
     }
-    
+
     public void Dispose()
     {
         _cancellationTokenSource.Cancel();
-        _cancellationTokenSource.Dispose();
         _writer.Wait();
         _writer.Dispose();
+        
         foreach (var logWriter in _loggerWriters)
         {
             logWriter.Dispose();
         }
+
+        _cancellationTokenSource.Dispose();
     }
 }
