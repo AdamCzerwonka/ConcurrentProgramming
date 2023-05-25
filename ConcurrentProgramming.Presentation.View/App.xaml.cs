@@ -16,12 +16,9 @@ namespace ConcurrentProgramming.Presentation.View
             ConfigureServices(services);
             _serviceProvider = services.BuildServiceProvider();
 
-            Dispatcher.ShutdownStarted += (sender, args) =>
-            {
-                _serviceProvider.GetRequiredService<MainViewModel>().Dispose();
-            };
+            Dispatcher.ShutdownStarted += (_, _) => { _serviceProvider.Dispose(); };
         }
-        
+
         private void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<MainViewModel>();
