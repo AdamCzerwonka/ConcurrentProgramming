@@ -28,6 +28,7 @@ public class TextLogWriter : ILogWriter
         var builder = new StringBuilder();
         builder.Append($"[{log.LogLevel.ToString()}] ");
         builder.Append($"[{log.Time}] ");
+        builder.Append($"[{log.ThreadId}] ");
         builder.Append(log.Message);
         await _fileWriter.WriteLineAsync(builder.ToString());
         _fileWriter.Flush();

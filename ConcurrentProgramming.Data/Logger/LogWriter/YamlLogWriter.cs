@@ -29,6 +29,7 @@ public class YamlLogWriter : ILogWriter
             new YamlDocument(
                 new YamlMappingNode(new YamlScalarNode(log.LogLevel.ToString()),
                     new YamlMappingNode(
+                        new YamlScalarNode("threadId"), new YamlScalarNode(log.ThreadId.ToString()),
                             new YamlScalarNode("date"), new YamlScalarNode(log.Time.ToString()),
                             new YamlScalarNode("message"), new YamlScalarNode(log.Message)))));
 
