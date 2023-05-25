@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Threading;
 using ConcurrentProgramming.Data;
 using ConcurrentProgramming.Data.Logger;
+using ConcurrentProgramming.Data.Logger.LogWriter;
 
 namespace ConcurrentProgramming.Logic;
 
@@ -28,7 +29,6 @@ public class BallManager : IBallManager
         _logger.RegisterWriter(new JsonLogWriter("test.json"));
         _logger.RegisterWriter(new YamlLogWriter("test.yaml"));
         _logger.RegisterWriter(new XmlLogWriter("test.xml"));
-        _logger.Start();
     }
 
     public event EventHandler<BallEventArgs>? BallCreated;

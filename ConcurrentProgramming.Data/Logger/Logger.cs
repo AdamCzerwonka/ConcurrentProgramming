@@ -4,26 +4,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ConcurrentProgramming.Data.Logger.LogWriter;
 
 namespace ConcurrentProgramming.Data.Logger;
 
 public class Logger : ILogger
 {
     private readonly ConcurrentQueue<LogEntry> _logs = new();
-    private Task _writer;
+    private Task _writer = null!;
     private readonly List<ILogWriter> _loggerWriters = new();
-    private bool isLogging;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private static ILogger? _instance;
-    private static object _loggerLock = new();
+    private static readonly object LoggerLock = new();
 
     public static ILogger GetLogger()
     {
+        // ReSharper disable once InvertIf
         if (_instance is null)
         {
-            lock (_loggerLock)
+            lock (LoggerLock)
             {
-                _instance = new Logger();
+                // ReSharper disable once InvertIf
+                if (_instance is null)
+                {
+                    _instance = new Logger();
+                    ((Logger)_instance).Start();
+                }
             }
         }
 
@@ -47,9 +53,23 @@ public class Logger : ILogger
         _logs.Enqueue(entry);
     }
 
-    public void Start()
+    public void LogInformation(string message)
     {
-        isLogging = true;
+        Log(LogLevel.Information, message);
+    }
+
+    public void LogWarning(string message)
+    {
+        Log(LogLevel.Warning, message);
+    }
+
+    public void LogError(string message)
+    {
+        Log(LogLevel.Error, message);
+    }
+
+    private void Start()
+    {
         var token = _cancellationTokenSource.Token;
         _writer = Task.Run(() => WriteLogs(token), token);
     }
@@ -64,6 +84,19 @@ public class Logger : ILogger
         return _logs.Count;
     }
 
+    private async Task WriteLogs(CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested || !_logs.IsEmpty)
+        {
+            if (_logs.TryDequeue(out var log))
+            {
+                await Task.WhenAll(_loggerWriters.Select(w => w.Write(log)));
+            }
+
+            await Task.Delay(50, cancellationToken);
+        }
+    }
+    
     public void Dispose()
     {
         _cancellationTokenSource.Cancel();
@@ -73,17 +106,6 @@ public class Logger : ILogger
         foreach (var logWriter in _loggerWriters)
         {
             logWriter.Dispose();
-        }
-    }
-
-    private async Task WriteLogs(CancellationToken cancellationToken)
-    {
-        while (!cancellationToken.IsCancellationRequested || !_logs.IsEmpty)
-        {
-            if (_logs.TryDequeue(out var log))
-            {
-                await Task.WhenAll(_loggerWriters.Select(w => w.Write(log)));
-            }
         }
     }
 }

@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Xml;
 using System.Xml.Serialization;
 
-namespace ConcurrentProgramming.Data.Logger;
+namespace ConcurrentProgramming.Data.Logger.LogWriter;
 
 public class XmlLogWriter : ILogWriter
 {

@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConcurrentProgramming.Data.Logger;
+namespace ConcurrentProgramming.Data.Logger.LogWriter;
 
 public class TextLogWriter : ILogWriter
 {
