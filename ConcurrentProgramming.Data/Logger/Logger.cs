@@ -11,11 +11,10 @@ namespace ConcurrentProgramming.Data.Logger;
 public class Logger : ILogger
 {
     private readonly ConcurrentQueue<LogEntry> _logs = new();
-    private Task _writer = null!;
     private readonly List<ILogWriter> _loggerWriters = new();
-    private readonly CancellationTokenSource _cancellationTokenSource = new();
     private static ILogger? _instance;
     private static readonly object LoggerLock = new();
+    private Timer logTimer = null!;
 
     public static ILogger GetLogger()
     {
@@ -70,44 +69,25 @@ public class Logger : ILogger
 
     private void Start()
     {
-        var token = _cancellationTokenSource.Token;
-        _writer = Task.Run(() => WriteLogs(token), token);
+        logTimer = new Timer((state) => WriteLogs(state), null, TimeSpan.Zero, TimeSpan.FromMilliseconds(30));
     }
 
-    public void StopLogging()
+    private async Task WriteLogs(object? _)
     {
-        _cancellationTokenSource.Cancel();
-    }
-
-    public int GetNumberOfUnwrittenLogs()
-    {
-        return _logs.Count;
-    }
-
-    private async Task WriteLogs(CancellationToken cancellationToken)
-    {
-        while (!cancellationToken.IsCancellationRequested || !_logs.IsEmpty)
+        if (_logs.TryDequeue(out var log))
         {
-            if (_logs.TryDequeue(out var log))
-            {
-                await Task.WhenAll(_loggerWriters.Select(w => w.Write(log)));
-            }
-
-            await Task.Delay(32, CancellationToken.None);
+            await Task.WhenAll(_loggerWriters.Select(w => w.Write(log)));
         }
     }
 
     public void Dispose()
     {
-        _cancellationTokenSource.Cancel();
-        _writer.Wait();
-        _writer.Dispose();
-        
+        logTimer.Dispose();
+
         foreach (var logWriter in _loggerWriters)
         {
             logWriter.Dispose();
         }
 
-        _cancellationTokenSource.Dispose();
     }
 }
